@@ -1,4 +1,4 @@
-module github.com/naxumi/indo-cloud
+module github.com/naxumi/indo-cloud/indo-cloud-be
 
 go 1.27.0
 
