@@ -61,5 +61,8 @@ func Load() (*Config, error) {
 	}
 	config.DatabaseConfig.MaxConns = max
 
+	config.DatabaseConfig.MigrateUp = os.Getenv("DB_MIGRATE") == "true"
+	config.DatabaseConfig.MigrationsPath = os.Getenv("DB_MIGRATIONS_PATH")
+
 	return &config, nil
 }

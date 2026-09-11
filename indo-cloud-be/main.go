@@ -79,7 +79,6 @@ func main() {
 		createTask(w, r, db)
 	})
 
-	// Endpoint PATCH ini sekarang menangani update Status, Title, DAN Note
 	r.Patch("/api/tasks/{id}", func(w http.ResponseWriter, r *http.Request) {
 		updateTask(w, r, db)
 	})
@@ -92,7 +91,6 @@ func main() {
 }
 
 func getAllTasks(w http.ResponseWriter, r *http.Request, db *DB) {
-	// Filter berdasarkan status (all / pending / completed), kosong = all
 	statusFilter := r.URL.Query().Get("status")
 	var statusParam TaskStatus
 	switch statusFilter {
@@ -125,7 +123,6 @@ func getAllTasks(w http.ResponseWriter, r *http.Request, db *DB) {
 	var tasks []Task
 	for rows.Next() {
 		var t Task
-		// Scan juga wajib menyertakan note
 		if err := rows.Scan(&t.ID, &t.Title, &t.Status, &t.CreatedAt); err != nil {
 			http.Error(w, "Failed to scan row", http.StatusInternalServerError)
 			log.Printf("Failed to scan row: %v", err)
@@ -164,7 +161,6 @@ func createTask(w http.ResponseWriter, r *http.Request, db *DB) {
 		return
 	}
 
-	// Insert menyertakan note
 	_, err := db.Exec(r.Context(), "INSERT INTO tasks (title, status) VALUES ($1, $2)",
 		t.Title, t.Status)
 	if err != nil {
@@ -178,7 +174,6 @@ func createTask(w http.ResponseWriter, r *http.Request, db *DB) {
 	json.NewEncoder(w).Encode(t)
 }
 
-// UPDATE (PATCH) yang Dinamis
 func updateTask(w http.ResponseWriter, r *http.Request, db *DB) {
 	id := chi.URLParam(r, "id")
 
@@ -188,7 +183,6 @@ func updateTask(w http.ResponseWriter, r *http.Request, db *DB) {
 		return
 	}
 
-	// PATCH yang dinamis: hanya field yang dikirim yang akan di-update
 	var payload struct {
 		Title  *string `json:"title"`
 		Status *string `json:"status"`
@@ -213,7 +207,6 @@ func updateTask(w http.ResponseWriter, r *http.Request, db *DB) {
 		return
 	}
 
-	// COALESCE akan menyimpan nilai lama jika nilai baru yang dikirim adalah nil (tidak dikirim)
 	_, err = db.Exec(r.Context(), `
 		UPDATE tasks
 		SET
